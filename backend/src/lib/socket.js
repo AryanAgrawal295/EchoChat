@@ -20,10 +20,25 @@ const io = new Server(server, {
   },
 });
 
+/* helper: parse jwt from cookie header */
+function getTokenFromCookieHeader(cookieHeader) {
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(";").map(c => c.trim());
+  for (const c of cookies) {
+    const [name, ...rest] = c.split("=");
+    if (name === "jwt") return decodeURIComponent(rest.join("="));
+  }
+  return null;
+}
+
 /* 🔐 SOCKET AUTH MIDDLEWARE */
 io.use((socket, next) => {
   try {
-    const token = socket.handshake.auth?.token;
+    // prefer explicit auth token (if frontend sends it), otherwise try cookies
+    const authToken = socket.handshake.auth?.token;
+    const cookieHeader = socket.handshake.headers?.cookie;
+    const token = authToken || getTokenFromCookieHeader(cookieHeader);
+
     if (!token) return next(new Error("Unauthorized"));
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

@@ -26,11 +26,13 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://echo-chat-second.vercel.app"
+      "https://echo-chat-second.vercel.app",
+      "https://echo-chat-second-git-main-aryanagrawal295s-projects.vercel.app"
     ],
     credentials: true,
   })
 );
+
 
 
 app.use("/api/auth", authRoutes)

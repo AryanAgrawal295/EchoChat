@@ -88,11 +88,15 @@ export const useAuthStore = create((set, get) => ({
     if(!authUser || get().socket?.connected) return; // checking if useralready autheticated ore if he is already connected so no need to reconnect
 
 
-    const socket = io(BASE_URL,{
-      query:{
-        userId: authUser._id,
+    const socket = io(BASE_URL, {
+      auth: {
+        token: localStorage.getItem("token"),
       },
-    }) // io() connects to youus socket.io server and returns an socket instance which has all its properties like connect , disconnect , etc
+      withCredentials: true,
+      autoConnect: false,
+    });
+
+     // io() connects to youus socket.io server and returns an socket instance which has all its properties like connect , disconnect , etc
     socket.connect(); // manually starts the connection if you created it with { autoConnect: false }
     set({socket: socket}); // storing socket into its instance so that we can use the same socketr anywhere
 
